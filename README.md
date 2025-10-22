@@ -254,26 +254,88 @@ visa-consultancy-website/
 
 ## 🚀 Deployment
 
-### Frontend Deployment (Vercel/Netlify)
-1. Build the frontend: `cd client && npm run build`
-2. Deploy to Vercel or Netlify
-3. Set environment variables in your hosting platform
+### Quick Deploy Options
 
-### Backend Deployment (DigitalOcean/Railway/Heroku)
-1. Set up your Supabase database
-2. Configure environment variables
-3. Deploy the server code
-4. Update the client API URL to point to your deployed backend
+#### Option 1: Vercel (Frontend) + Railway (Backend) - Recommended
+1. **Frontend on Vercel:**
+   - Go to [vercel.com](https://vercel.com)
+   - Import your GitHub repository
+   - Set environment variables:
+     ```
+     NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+     NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+     ```
+   - Deploy automatically
+
+2. **Backend on Railway:**
+   - Go to [railway.app](https://railway.app)
+   - Connect your GitHub repository
+   - Set environment variables:
+     ```
+     NODE_ENV=production
+     PORT=10000
+     SUPABASE_URL=your_supabase_url
+     SUPABASE_ANON_KEY=your_supabase_anon_key
+     JWT_SECRET=your_jwt_secret
+     EMAIL_HOST=your_email_host
+     EMAIL_PORT=587
+     EMAIL_USER=your_email_user
+     EMAIL_PASS=your_email_password
+     ```
+   - Deploy automatically
+
+#### Option 2: Render (Full Stack)
+1. Go to [render.com](https://render.com)
+2. Create two services:
+   - **Backend Service:** Node.js with build command `cd server && npm install`
+   - **Frontend Service:** Static site with build command `cd client && npm install && npm run build`
+3. Configure environment variables for both services
+
+#### Option 3: Vercel (Full Stack)
+1. Deploy frontend to Vercel
+2. Use Vercel's serverless functions for API routes
+3. Configure environment variables in Vercel dashboard
 
 ### Environment Variables for Production
+
+#### Frontend (.env.local)
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+NEXT_PUBLIC_API_URL=https://your-backend-url.com/api
+```
+
+#### Backend (.env)
 ```env
 NODE_ENV=production
-PORT=5000
-CLIENT_URL=https://your-frontend-domain.com
-SUPABASE_URL=your-production-supabase-url
-SUPABASE_ANON_KEY=your-production-supabase-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-production-supabase-service-role-key
-JWT_SECRET=your-production-jwt-secret
+PORT=10000
+CLIENT_URL=https://your-frontend-url.com
+SUPABASE_URL=your_supabase_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+JWT_SECRET=your_jwt_secret
+EMAIL_HOST=your_email_host
+EMAIL_PORT=587
+EMAIL_USER=your_email_user
+EMAIL_PASS=your_email_password
+```
+
+### Deployment Files Included
+- `vercel.json` - Vercel deployment configuration
+- `railway.json` - Railway deployment configuration  
+- `render.yaml` - Render deployment configuration
+- `DEPLOYMENT.md` - Detailed deployment guide
+
+### Build Commands
+```bash
+# Install all dependencies
+npm run install-all
+
+# Build frontend
+npm run build
+
+# Start production server
+npm start
 ```
 
 ## 🔒 Security Features
