@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FaCalendarAlt, FaClock, FaUser, FaEnvelope, FaPhone, FaGlobe, FaCheckCircle } from 'react-icons/fa';
+import { FaCalendarAlt, FaClock, FaUser, FaEnvelope, FaPhone, FaGlobe, FaCheckCircle, FaWhatsapp } from 'react-icons/fa';
 
 const ConsultationPage = () => {
   const [formData, setFormData] = useState({
@@ -16,6 +16,7 @@ const ConsultationPage = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [showWhatsApp, setShowWhatsApp] = useState(false);
 
   const visaTypes = [
     'Student Visa',
@@ -88,10 +89,28 @@ const ConsultationPage = () => {
       }
     } catch (error) {
       console.error('Error submitting consultation:', error);
-      alert('There was an error submitting your consultation request. Please try again.');
+      setShowWhatsApp(true);
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const openWhatsApp = () => {
+    const phoneNumber = '+971502662341';
+    const message = `Hi! I would like to book a consultation for visa services. Here are my details:
+    
+Name: ${formData.name}
+Email: ${formData.email}
+Phone: ${formData.phone}
+Visa Type: ${formData.visaType}
+Country: ${formData.country}
+Preferred Date: ${formData.preferredDate}
+Preferred Time: ${formData.preferredTime}
+Consultation Type: ${formData.consultationType}
+Message: ${formData.message || 'No additional message'}`;
+
+    const whatsappUrl = `https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
   };
 
   if (isSubmitted) {
@@ -111,6 +130,43 @@ const ConsultationPage = () => {
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300"
             >
               Book Another Consultation
+            </button>
+            <a
+              href="/"
+              className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-6 rounded-lg transition duration-300 block"
+            >
+              Return to Home
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (showWhatsApp) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-16">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
+          <div className="bg-yellow-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+            <FaWhatsapp className="text-green-600 text-3xl" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Alternative Contact Method</h2>
+          <p className="text-gray-600 mb-6">
+            There was an issue with the online form. You can contact us directly via WhatsApp for immediate assistance with your consultation booking.
+          </p>
+          <div className="space-y-3">
+            <button
+              onClick={openWhatsApp}
+              className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center"
+            >
+              <FaWhatsapp className="mr-2" />
+              Contact via WhatsApp
+            </button>
+            <button
+              onClick={() => setShowWhatsApp(false)}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300"
+            >
+              Try Form Again
             </button>
             <a
               href="/"
@@ -322,6 +378,19 @@ const ConsultationPage = () => {
                     'Book Free Consultation'
                   )}
                 </button>
+
+                {/* WhatsApp Alternative */}
+                <div className="text-center">
+                  <p className="text-gray-600 mb-3">Or contact us directly via WhatsApp</p>
+                  <button
+                    type="button"
+                    onClick={openWhatsApp}
+                    className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center"
+                  >
+                    <FaWhatsapp className="mr-2" />
+                    WhatsApp: +971 50 266 2341
+                  </button>
+                </div>
               </form>
             </div>
 
@@ -381,6 +450,24 @@ const ConsultationPage = () => {
                     <span>Ongoing support throughout the process</span>
                   </li>
                 </ul>
+              </div>
+
+              {/* WhatsApp Contact */}
+              <div className="bg-gradient-to-r from-green-600 to-green-800 text-white rounded-lg p-8">
+                <h2 className="text-2xl font-bold mb-4 flex items-center">
+                  <FaWhatsapp className="mr-3" />
+                  Quick WhatsApp Contact
+                </h2>
+                <p className="mb-4">
+                  Need immediate assistance? Contact us directly via WhatsApp for instant support.
+                </p>
+                <button
+                  onClick={openWhatsApp}
+                  className="w-full bg-white text-green-600 hover:bg-gray-100 font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center"
+                >
+                  <FaWhatsapp className="mr-2" />
+                  Chat on WhatsApp: +971 50 266 2341
+                </button>
               </div>
             </div>
           </div>
