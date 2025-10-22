@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FaUser, FaPassport, FaGraduationCap, FaBriefcase, FaFileUpload, FaCheckCircle, FaArrowRight, FaArrowLeft } from 'react-icons/fa';
+import { FaUser, FaPassport, FaGraduationCap, FaBriefcase, FaFileUpload, FaCheckCircle, FaArrowRight, FaArrowLeft, FaWhatsapp } from 'react-icons/fa';
 
 const ApplicationPage = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -45,6 +45,7 @@ const ApplicationPage = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [showWhatsApp, setShowWhatsApp] = useState(false);
 
   const visaTypes = [
     'Student Visa',
@@ -114,6 +115,42 @@ const ApplicationPage = () => {
     }
   };
 
+  const openWhatsApp = () => {
+    const phoneNumber = '+971502662341';
+    const message = `Hi! I would like to submit a visa application. Here are my details:
+
+Personal Information:
+Name: ${formData.firstName} ${formData.lastName}
+Email: ${formData.email}
+Phone: ${formData.phone}
+Date of Birth: ${formData.dateOfBirth}
+Nationality: ${formData.nationality}
+Passport Number: ${formData.passportNumber}
+Passport Expiry: ${formData.passportExpiry}
+
+Visa Information:
+Visa Type: ${formData.visaType}
+Country: ${formData.country}
+Purpose of Visit: ${formData.purposeOfVisit}
+Intended Arrival Date: ${formData.intendedArrivalDate}
+Duration of Stay: ${formData.durationOfStay}
+
+Background:
+Education Level: ${formData.educationLevel}
+Current Occupation: ${formData.currentOccupation}
+Work Experience: ${formData.workExperience}
+Annual Income: ${formData.annualIncome}
+
+Additional Information:
+Previous Visa History: ${formData.previousVisaHistory}
+Criminal Record: ${formData.criminalRecord}
+Health Conditions: ${formData.healthConditions}
+Additional Info: ${formData.additionalInfo}`;
+
+    const whatsappUrl = `https://wa.me/${phoneNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -146,7 +183,7 @@ const ApplicationPage = () => {
       }
     } catch (error) {
       console.error('Error submitting application:', error);
-      alert('There was an error submitting your application. Please try again.');
+      setShowWhatsApp(true);
     } finally {
       setIsSubmitting(false);
     }
@@ -202,6 +239,43 @@ const ApplicationPage = () => {
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300"
             >
               Submit Another Application
+            </button>
+            <a
+              href="/"
+              className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-6 rounded-lg transition duration-300 block"
+            >
+              Return to Home
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (showWhatsApp) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-16">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
+          <div className="bg-yellow-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+            <FaWhatsapp className="text-green-600 text-3xl" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Alternative Submission Method</h2>
+          <p className="text-gray-600 mb-6">
+            There was an issue with the online form submission. You can submit your visa application directly via WhatsApp for immediate processing.
+          </p>
+          <div className="space-y-3">
+            <button
+              onClick={openWhatsApp}
+              className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300 flex items-center justify-center"
+            >
+              <FaWhatsapp className="mr-2" />
+              Submit via WhatsApp
+            </button>
+            <button
+              onClick={() => setShowWhatsApp(false)}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300"
+            >
+              Try Form Again
             </button>
             <a
               href="/"
@@ -641,9 +715,21 @@ const ApplicationPage = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold text-gray-800 mb-6">Visa Application Form</h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-6">
             Complete your visa application step by step. Our secure form will guide you through the entire process.
           </p>
+          
+          {/* WhatsApp Contact Option */}
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4 max-w-md mx-auto">
+            <p className="text-gray-700 mb-3">Need help with your application?</p>
+            <button
+              onClick={openWhatsApp}
+              className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 flex items-center justify-center mx-auto"
+            >
+              <FaWhatsapp className="mr-2" />
+              WhatsApp: +971 50 266 2341
+            </button>
+          </div>
         </div>
 
         <div className="max-w-4xl mx-auto">
