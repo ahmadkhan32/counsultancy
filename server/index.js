@@ -38,6 +38,7 @@ app.use('/api/inquiries', require('./routes/inquiries'));
 app.use('/api/countries', require('./routes/countries'));
 app.use('/api/visa-types', require('./routes/visaTypes'));
 app.use('/api/blog', require('./routes/blog'));
+app.use('/api/ai-blog', require('./routes/ai-blog'));
 app.use('/api/testimonials', require('./routes/testimonials'));
 
 // Health check
