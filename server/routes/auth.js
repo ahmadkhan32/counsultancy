@@ -13,11 +13,108 @@ const generateToken = (id) => {
   });
 };
 
+// @route   POST /api/auth/register-admin
+// @desc    Register new admin
+// @access  Public
+router.post('/register-admin', [
+  body('firstName').notEmpty().trim().isLength({ min: 2, max: 50 }),
+  body('lastName').notEmpty().trim().isLength({ min: 2, max: 50 }),
+  body('email').isEmail().normalizeEmail(),
+  body('password').isLength({ min: 8 }),
+  body('adminCode').notEmpty().trim()
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { firstName, lastName, email, password, adminCode } = req.body;
+
+    // Verify admin code
+    if (adminCode !== 'ADMIN2024') {
+      return res.status(400).json({ 
+        message: 'Invalid admin code',
+        errors: { adminCode: 'Invalid admin code' }
+      });
+    }
+
+    // Development bypass when Supabase is not configured
+    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
+      console.log('🔧 Using development registration bypass');
+      
+      // For development, just return success
+      return res.json({
+        message: 'Admin account created successfully (Development Mode)',
+        user: {
+          id: 'dev-admin-' + Date.now(),
+          email: email,
+          firstName: firstName,
+          lastName: lastName,
+          role: 'admin'
+        }
+      });
+    }
+
+    // Check if user already exists
+    const { data: existingUser, error: checkError } = await supabaseAdmin
+      .from('admin_users')
+      .select('id')
+      .eq('email', email)
+      .single();
+
+    if (existingUser) {
+      return res.status(400).json({ 
+        message: 'Admin with this email already exists',
+        errors: { email: 'Email already registered' }
+      });
+    }
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Create admin user
+    const { data: newUser, error: createError } = await supabaseAdmin
+      .from('admin_users')
+      .insert({
+        first_name: firstName,
+        last_name: lastName,
+        email: email,
+        password_hash: hashedPassword,
+        role: 'admin',
+        is_active: true,
+        created_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+
+    if (createError) {
+      console.error('Registration error:', createError);
+      return res.status(500).json({ message: 'Failed to create admin account' });
+    }
+
+    res.status(201).json({
+      message: 'Admin account created successfully',
+      user: {
+        id: newUser.id,
+        email: newUser.email,
+        firstName: newUser.first_name,
+        lastName: newUser.last_name,
+        role: newUser.role
+      }
+    });
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // @route   POST /api/auth/login
 // @desc    Login admin
 // @access  Public
 router.post('/login', [
-  body('email').isEmail().normalizeEmail(),
+  body('username').notEmpty().trim(),
   body('password').isLength({ min: 6 })
 ], async (req, res) => {
   try {
@@ -26,14 +123,14 @@ router.post('/login', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
     // Development bypass when Supabase is not configured
     if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
       console.log('🔧 Using development login bypass');
       
-      // Check for development credentials
-      if (email === 'admin@visaconsultancy.com' && password === 'admin123456') {
+      // Check for development credentials (support both email and username)
+      if ((username === 'admin@visaconsultancy.com' || username === 'admin') && password === 'admin123456') {
         const token = generateToken('dev-admin-1');
         
         return res.json({
@@ -41,6 +138,7 @@ router.post('/login', [
           user: {
             id: 'dev-admin-1',
             email: 'admin@visaconsultancy.com',
+            username: 'admin',
             role: 'admin'
           }
         });
@@ -50,10 +148,11 @@ router.post('/login', [
     }
 
     // Production Supabase authentication
+    // Try to find user by email or username
     const { data: user, error } = await supabaseAdmin
       .from('admin_users')
       .select('*')
-      .eq('email', email)
+      .or(`email.eq.${username},username.eq.${username}`)
       .single();
 
     if (error || !user) {

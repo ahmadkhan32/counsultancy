@@ -172,8 +172,21 @@ const AdminLoginPage = () => {
             </div>
           </form>
 
-          {/* Back to Website */}
+          {/* Registration Link */}
           <div className="mt-6 text-center">
+            <p className="text-gray-600">
+              Don't have an admin account?{' '}
+              <a
+                href="/admin/register"
+                className="font-medium text-blue-600 hover:text-blue-500 transition duration-300"
+              >
+                Register here
+              </a>
+            </p>
+          </div>
+
+          {/* Back to Website */}
+          <div className="mt-4 text-center">
             <a
               href="/"
               className="text-sm text-gray-600 hover:text-blue-600 transition duration-300"
