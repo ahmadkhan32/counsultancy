@@ -28,12 +28,20 @@ const AdminLoginPage = () => {
     setError('');
 
     try {
+      // Ensure only email and password are sent
+      const loginData = {
+        email: formData.email,
+        password: formData.password
+      };
+      
+      console.log('Sending login data:', loginData);
+      
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(loginData),
       });
 
       const data = await response.json();
