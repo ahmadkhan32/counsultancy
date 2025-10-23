@@ -128,9 +128,24 @@ router.post('/login', [
 
     // Development bypass - always use for development
     console.log('🔧 Using development login bypass');
+    console.log('📧 Email received:', email);
+    console.log('🔑 Password received:', password);
+    console.log('📧 Email type:', typeof email);
+    console.log('🔑 Password type:', typeof password);
+    console.log('📧 Email length:', email.length);
+    console.log('🔑 Password length:', password.length);
+    console.log('✅ Expected email: admin@visaconsultancy.com');
+    console.log('✅ Expected password: admin123456');
     
-    // Check for development credentials
-    if (email === 'admin@visaconsultancy.com' && password === 'admin123456') {
+    // Check for development credentials with more flexible matching
+    const emailMatch = email === 'admin@visaconsultancy.com' || email === 'admin@visaconsultancy.com ';
+    const passwordMatch = password === 'admin123456' || password === 'admin123456 ';
+    
+    console.log('📧 Email match:', emailMatch);
+    console.log('🔑 Password match:', passwordMatch);
+    
+    if (emailMatch && passwordMatch) {
+      console.log('✅ Development credentials match!');
       const token = generateToken('dev-admin-1');
       
       return res.json({
@@ -142,6 +157,7 @@ router.post('/login', [
         }
       });
     } else {
+      console.log('❌ Development credentials do not match');
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
