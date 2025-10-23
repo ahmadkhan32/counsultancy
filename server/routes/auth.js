@@ -114,7 +114,7 @@ router.post('/register-admin', [
 // @desc    Login admin
 // @access  Public
 router.post('/login', [
-  body('username').notEmpty().trim(),
+  body('email').isEmail().normalizeEmail(),
   body('password').isLength({ min: 6 })
 ], async (req, res) => {
   try {
@@ -123,14 +123,14 @@ router.post('/login', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
     // Development bypass when Supabase is not configured
     if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
       console.log('🔧 Using development login bypass');
       
-      // Check for development credentials (support both email and username)
-      if ((username === 'admin@visaconsultancy.com' || username === 'admin') && password === 'admin123456') {
+      // Check for development credentials
+      if (email === 'admin@visaconsultancy.com' && password === 'admin123456') {
         const token = generateToken('dev-admin-1');
         
         return res.json({
@@ -138,7 +138,6 @@ router.post('/login', [
           user: {
             id: 'dev-admin-1',
             email: 'admin@visaconsultancy.com',
-            username: 'admin',
             role: 'admin'
           }
         });
@@ -148,11 +147,11 @@ router.post('/login', [
     }
 
     // Production Supabase authentication
-    // Try to find user by email or username
+    // Find user by email
     const { data: user, error } = await supabaseAdmin
       .from('admin_users')
       .select('*')
-      .or(`email.eq.${username},username.eq.${username}`)
+      .eq('email', email)
       .single();
 
     if (error || !user) {
