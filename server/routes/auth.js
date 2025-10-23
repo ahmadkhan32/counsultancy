@@ -39,22 +39,20 @@ router.post('/register-admin', [
       });
     }
 
-    // Development bypass when Supabase is not configured
-    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
-      console.log('🔧 Using development registration bypass');
-      
-      // For development, just return success
-      return res.json({
-        message: 'Admin account created successfully (Development Mode)',
-        user: {
-          id: 'dev-admin-' + Date.now(),
-          email: email,
-          firstName: firstName,
-          lastName: lastName,
-          role: 'admin'
-        }
-      });
-    }
+    // Development bypass - always use for development
+    console.log('🔧 Using development registration bypass');
+    
+    // For development, just return success
+    return res.json({
+      message: 'Admin account created successfully (Development Mode)',
+      user: {
+        id: 'dev-admin-' + Date.now(),
+        email: email,
+        firstName: firstName,
+        lastName: lastName,
+        role: 'admin'
+      }
+    });
 
     // Check if user already exists
     const { data: existingUser, error: checkError } = await supabaseAdmin
@@ -128,25 +126,23 @@ router.post('/login', [
 
     const { email, password } = req.body;
 
-    // Development bypass when Supabase is not configured
-    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
-      console.log('🔧 Using development login bypass');
+    // Development bypass - always use for development
+    console.log('🔧 Using development login bypass');
+    
+    // Check for development credentials
+    if (email === 'admin@visaconsultancy.com' && password === 'admin123456') {
+      const token = generateToken('dev-admin-1');
       
-      // Check for development credentials
-      if (email === 'admin@visaconsultancy.com' && password === 'admin123456') {
-        const token = generateToken('dev-admin-1');
-        
-        return res.json({
-          token,
-          user: {
-            id: 'dev-admin-1',
-            email: 'admin@visaconsultancy.com',
-            role: 'admin'
-          }
-        });
-      } else {
-        return res.status(400).json({ message: 'Invalid credentials' });
-      }
+      return res.json({
+        token,
+        user: {
+          id: 'dev-admin-1',
+          email: 'admin@visaconsultancy.com',
+          role: 'admin'
+        }
+      });
+    } else {
+      return res.status(400).json({ message: 'Invalid credentials' });
     }
 
     // Production Supabase authentication
