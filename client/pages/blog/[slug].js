@@ -121,9 +121,7 @@ const BlogPostPage = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-800 mb-4">Blog Not Found</h1>
-          <Link href="/blog">
-            <a className="text-blue-600 hover:text-blue-800">← Back to Blog</a>
-          </Link>
+          <Link href="/blog" className="text-blue-600 hover:text-blue-800">← Back to Blog</Link>
         </div>
       </div>
     );
@@ -134,11 +132,9 @@ const BlogPostPage = () => {
       {/* Header */}
       <div className="bg-white shadow-sm">
         <div className="container mx-auto px-4 py-6">
-          <Link href="/blog">
-            <a className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-4">
-              <FaArrowLeft className="mr-2" />
-              Back to Blog
-            </a>
+          <Link href="/blog" className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-4">
+            <FaArrowLeft className="mr-2" />
+            Back to Blog
           </Link>
           
           <div className="flex items-center justify-between">

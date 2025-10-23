@@ -312,21 +312,17 @@ const AdminRegisterPage = () => {
           <div className="mt-6 text-center">
             <p className="text-gray-600">
               Already have an admin account?{' '}
-              <Link href="/admin/login">
-                <a className="text-blue-600 hover:text-blue-800 font-medium">
-                  Login here
-                </a>
+              <Link href="/admin/login" className="text-blue-600 hover:text-blue-800 font-medium">
+                Login here
               </Link>
             </p>
           </div>
 
           {/* Back to Home */}
           <div className="mt-4 text-center">
-            <Link href="/">
-              <a className="inline-flex items-center text-gray-600 hover:text-gray-800">
-                <FaArrowLeft className="mr-2" />
-                Back to Home
-              </a>
+            <Link href="/" className="inline-flex items-center text-gray-600 hover:text-gray-800">
+              <FaArrowLeft className="mr-2" />
+              Back to Home
             </Link>
           </div>
         </div>

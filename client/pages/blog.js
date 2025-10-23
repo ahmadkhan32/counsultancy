@@ -266,11 +266,9 @@ const BlogPage = () => {
                     )}
 
                     {/* Read More Button */}
-                    <Link href={`/blog/${blog.slug}`}>
-                      <a className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition duration-300">
-                        Read More
-                        <FaArrowRight className="ml-2" />
-                      </a>
+                    <Link href={`/blog/${blog.slug}`} className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition duration-300">
+                      Read More
+                      <FaArrowRight className="ml-2" />
                     </Link>
                   </div>
                 </article>
