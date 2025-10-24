@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { FaLock, FaUser, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 const AdminLoginPage = () => {
   const [formData, setFormData] = useState({
@@ -184,23 +185,23 @@ const AdminLoginPage = () => {
           <div className="mt-6 text-center">
             <p className="text-gray-600">
               Don't have an admin account?{' '}
-              <a
+              <Link
                 href="/admin/register"
                 className="font-medium text-blue-600 hover:text-blue-500 transition duration-300"
               >
                 Register here
-              </a>
+              </Link>
             </p>
           </div>
 
           {/* Back to Website */}
           <div className="mt-4 text-center">
-            <a
+            <Link
               href="/"
               className="text-sm text-gray-600 hover:text-blue-600 transition duration-300"
             >
               ← Back to Website
-            </a>
+            </Link>
           </div>
         </div>
 

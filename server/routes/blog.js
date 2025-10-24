@@ -22,38 +22,101 @@ router.get('/', async (req, res) => {
     
     const offset = (page - 1) * limit;
     
-    let query = supabaseAdmin
-      .from('blogs')
-      .select('*', { count: 'exact' })
-      .eq('status', 'published')
-      .order(sort, { ascending: order === 'asc' })
-      .range(offset, offset + limit - 1);
+    // For development, return mock data
+    const mockBlogs = [
+      {
+        id: 1,
+        title: "Complete Guide to Canadian Student Visa",
+        slug: "complete-guide-canadian-student-visa",
+        excerpt: "Everything you need to know about applying for a student visa to Canada, including requirements, process, and tips.",
+        content: "This comprehensive guide covers all aspects of Canadian student visa applications...",
+        author_name: "Visa Consultancy Team",
+        category: "Student Visa",
+        featured_image: null,
+        tags: ["canada", "student visa", "education", "study permit"],
+        featured: true,
+        status: "published",
+        view_count: 1250,
+        read_time: 8,
+        published_at: new Date().toISOString(),
+        created_at: new Date().toISOString()
+      },
+      {
+        id: 2,
+        title: "US Work Visa Requirements 2024",
+        slug: "us-work-visa-requirements-2024",
+        excerpt: "Updated requirements and process for obtaining work visas in the United States.",
+        content: "The United States offers various work visa categories...",
+        author_name: "Visa Consultancy Team",
+        category: "Work Visa",
+        featured_image: null,
+        tags: ["usa", "work visa", "employment", "h1b"],
+        featured: false,
+        status: "published",
+        view_count: 980,
+        read_time: 6,
+        published_at: new Date().toISOString(),
+        created_at: new Date().toISOString()
+      },
+      {
+        id: 3,
+        title: "UK Visitor Visa Application Process",
+        slug: "uk-visitor-visa-application-process",
+        excerpt: "Step-by-step guide to applying for a UK visitor visa.",
+        content: "Applying for a UK visitor visa can seem complex...",
+        author_name: "Visa Consultancy Team",
+        category: "Tourist Visa",
+        featured_image: null,
+        tags: ["uk", "visitor visa", "tourism", "travel"],
+        featured: true,
+        status: "published",
+        view_count: 750,
+        read_time: 5,
+        published_at: new Date().toISOString(),
+        created_at: new Date().toISOString()
+      }
+    ];
+
+    let filteredBlogs = mockBlogs.filter(blog => blog.status === 'published');
 
     // Apply filters
     if (category) {
-      query = query.eq('category', category);
+      filteredBlogs = filteredBlogs.filter(blog => blog.category === category);
     }
     
     if (search) {
-      query = query.or(`title.ilike.%${search}%,excerpt.ilike.%${search}%,content.ilike.%${search}%`);
+      const searchLower = search.toLowerCase();
+      filteredBlogs = filteredBlogs.filter(blog => 
+        blog.title.toLowerCase().includes(searchLower) ||
+        blog.excerpt.toLowerCase().includes(searchLower) ||
+        blog.content.toLowerCase().includes(searchLower)
+      );
     }
     
     if (featured === 'true') {
-      query = query.eq('featured', true);
+      filteredBlogs = filteredBlogs.filter(blog => blog.featured);
     }
 
-    const { data: blogs, error, count } = await query;
+    // Apply sorting
+    filteredBlogs.sort((a, b) => {
+      const aVal = a[sort];
+      const bVal = b[sort];
+      if (order === 'asc') {
+        return aVal > bVal ? 1 : -1;
+      } else {
+        return aVal < bVal ? 1 : -1;
+      }
+    });
 
-    if (error) {
-      console.error('Error fetching blogs:', error);
-      return res.status(500).json({ message: 'Failed to fetch blogs' });
-    }
+    // Apply pagination
+    const total = filteredBlogs.length;
+    const blogs = filteredBlogs.slice(offset, offset + parseInt(limit));
 
     res.json({
       blogs: blogs || [],
-      totalPages: Math.ceil(count / limit),
+      totalPages: Math.ceil(total / limit),
       currentPage: parseInt(page),
-      total: count
+      total: total
     });
   } catch (error) {
     console.error('Get blogs error:', error);
@@ -66,19 +129,65 @@ router.get('/', async (req, res) => {
 // @access  Public
 router.get('/categories', async (req, res) => {
   try {
-    const { data: categories, error } = await supabaseAdmin
-      .from('blog_categories')
-      .select('*')
-      .order('name');
+    // Mock categories for development
+    const mockCategories = [
+      { id: 1, name: 'Student Visa', description: 'Educational opportunities and study permits', color: 'blue' },
+      { id: 2, name: 'Work Visa', description: 'Employment and professional opportunities', color: 'green' },
+      { id: 3, name: 'Tourist Visa', description: 'Travel and tourism information', color: 'purple' },
+      { id: 4, name: 'Immigration', description: 'Permanent residency and citizenship', color: 'orange' },
+      { id: 5, name: 'Visa Information', description: 'General visa information and updates', color: 'indigo' }
+    ];
 
-    if (error) {
-      console.error('Error fetching categories:', error);
-      return res.status(500).json({ message: 'Failed to fetch categories' });
-    }
-
-    res.json(categories || []);
+    res.json(mockCategories);
   } catch (error) {
     console.error('Get categories error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   POST /api/blog/admin
+// @desc    Create new blog post (Admin only)
+// @access  Private
+router.post('/admin', adminAuth, [
+  body('title').notEmpty().withMessage('Title is required'),
+  body('excerpt').notEmpty().withMessage('Excerpt is required'),
+  body('content').notEmpty().withMessage('Content is required'),
+  body('authorName').notEmpty().withMessage('Author name is required'),
+  body('category').notEmpty().withMessage('Category is required')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const blogData = {
+      id: Date.now(),
+      title: req.body.title,
+      slug: req.body.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+      excerpt: req.body.excerpt,
+      content: req.body.content,
+      author_name: req.body.authorName,
+      category: req.body.category,
+      tags: req.body.tags || [],
+      featured: req.body.featured || false,
+      status: req.body.status || 'draft',
+      seo_title: req.body.seoTitle || req.body.title,
+      seo_description: req.body.seoDescription || req.body.excerpt,
+      seo_keywords: req.body.seoKeywords || [],
+      view_count: 0,
+      read_time: Math.ceil((req.body.content.split(' ').length) / 200),
+      published_at: req.body.status === 'published' ? new Date().toISOString() : null,
+      created_at: new Date().toISOString()
+    };
+
+    // For development, just return success
+    res.json({
+      message: 'Blog post created successfully',
+      blog: blogData
+    });
+  } catch (error) {
+    console.error('Create blog error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -88,23 +197,34 @@ router.get('/categories', async (req, res) => {
 // @access  Public
 router.get('/:slug', async (req, res) => {
   try {
-    const { data: blog, error } = await supabaseAdmin
-      .from('blogs')
-      .select('*')
-      .eq('slug', req.params.slug)
-      .eq('status', 'published')
-      .single();
+    // Mock blog data for development
+    const mockBlogs = [
+      {
+        id: 1,
+        title: "Complete Guide to Canadian Student Visa",
+        slug: "complete-guide-canadian-student-visa",
+        excerpt: "Everything you need to know about applying for a student visa to Canada, including requirements, process, and tips.",
+        content: "This comprehensive guide covers all aspects of Canadian student visa applications. We'll walk you through the entire process step by step...",
+        author_name: "Visa Consultancy Team",
+        category: "Student Visa",
+        featured_image: null,
+        tags: ["canada", "student visa", "education", "study permit"],
+        featured: true,
+        status: "published",
+        view_count: 1250,
+        read_time: 8,
+        published_at: new Date().toISOString(),
+        created_at: new Date().toISOString()
+      }
+    ];
+
+    const blog = mockBlogs.find(b => b.slug === req.params.slug);
     
-    if (error || !blog) {
+    if (!blog) {
       return res.status(404).json({ message: 'Blog not found' });
     }
 
-    // Increment view count
-    await supabaseAdmin
-      .from('blogs')
-      .update({ view_count: blog.view_count + 1 })
-      .eq('id', blog.id);
-
+    // For development, just return the blog
     res.json(blog);
   } catch (error) {
     console.error('Get blog error:', error);

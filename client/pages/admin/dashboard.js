@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { FaUsers, FaFileAlt, FaCalendarAlt, FaEnvelope, FaSignOutAlt, FaChartBar, FaCheckCircle, FaClock, FaExclamationTriangle } from 'react-icons/fa';
+import { FaUsers, FaFileAlt, FaCalendarAlt, FaEnvelope, FaChartBar, FaCheckCircle, FaClock, FaExclamationTriangle } from 'react-icons/fa';
 import { useRouter } from 'next/router';
+import AdminLayout from '../../components/AdminLayout';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
@@ -17,16 +18,9 @@ const AdminDashboard = () => {
   const router = useRouter();
 
   useEffect(() => {
-    // Check if user is logged in
-    const token = localStorage.getItem('adminToken');
-    if (!token) {
-      router.push('/admin/login');
-      return;
-    }
-
     // Fetch dashboard data
     fetchDashboardData();
-  }, [router]);
+  }, []);
 
   const fetchDashboardData = async () => {
     try {
@@ -90,11 +84,6 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('adminToken');
-    localStorage.removeItem('adminUser');
-    router.push('/admin/login');
-  };
 
   const getActivityIcon = (type) => {
     switch (type) {
@@ -136,27 +125,12 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-800">Admin Dashboard</h1>
-              <p className="text-gray-600">Welcome back, Admin</p>
-            </div>
-            <button
-              onClick={handleLogout}
-              className="flex items-center text-gray-600 hover:text-red-600 transition duration-300"
-            >
-              <FaSignOutAlt className="mr-2" />
-              Logout
-            </button>
-          </div>
+    <AdminLayout>
+      <div className="p-6">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-800">Dashboard Overview</h1>
+          <p className="text-gray-600">Welcome back! Here's what's happening with your visa consultancy.</p>
         </div>
-      </header>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Total Applications */}
@@ -306,7 +280,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 };
 

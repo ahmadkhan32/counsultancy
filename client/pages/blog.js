@@ -27,25 +27,145 @@ const BlogPage = () => {
   const fetchBlogs = async () => {
     try {
       setLoading(true);
-      const queryParams = new URLSearchParams({
-        page: filters.page,
-        limit: filters.limit,
-        ...(filters.search && { search: filters.search }),
-        ...(filters.category && { category: filters.category }),
-        ...(filters.featured && { featured: 'true' })
-      });
+      
+      // Mock blog data for development
+      const mockBlogs = [
+        {
+          id: 1,
+          title: "Complete Guide to Canadian Student Visa",
+          slug: "complete-guide-canadian-student-visa",
+          excerpt: "Everything you need to know about applying for a student visa to Canada, including requirements, process, and tips.",
+          content: "This comprehensive guide covers all aspects of Canadian student visa applications...",
+          author_name: "Visa Consultancy Team",
+          category: "Student Visa",
+          featured_image: null,
+          tags: ["canada", "student visa", "education", "study permit"],
+          featured: true,
+          status: "published",
+          view_count: 1250,
+          read_time: 8,
+          published_at: new Date().toISOString(),
+          created_at: new Date().toISOString()
+        },
+        {
+          id: 2,
+          title: "US Work Visa Requirements 2024",
+          slug: "us-work-visa-requirements-2024",
+          excerpt: "Updated requirements and process for obtaining work visas in the United States.",
+          content: "The United States offers various work visa categories...",
+          author_name: "Visa Consultancy Team",
+          category: "Work Visa",
+          featured_image: null,
+          tags: ["usa", "work visa", "employment", "h1b"],
+          featured: false,
+          status: "published",
+          view_count: 980,
+          read_time: 6,
+          published_at: new Date().toISOString(),
+          created_at: new Date().toISOString()
+        },
+        {
+          id: 3,
+          title: "UK Visitor Visa Application Process",
+          slug: "uk-visitor-visa-application-process",
+          excerpt: "Step-by-step guide to applying for a UK visitor visa.",
+          content: "Applying for a UK visitor visa can seem complex...",
+          author_name: "Visa Consultancy Team",
+          category: "Tourist Visa",
+          featured_image: null,
+          tags: ["uk", "visitor visa", "tourism", "travel"],
+          featured: true,
+          status: "published",
+          view_count: 750,
+          read_time: 5,
+          published_at: new Date().toISOString(),
+          created_at: new Date().toISOString()
+        },
+        {
+          id: 4,
+          title: "Australia Study Permit Guide",
+          slug: "australia-study-permit-guide",
+          excerpt: "Complete guide to studying in Australia with student visa requirements.",
+          content: "Australia is a popular destination for international students...",
+          author_name: "Visa Consultancy Team",
+          category: "Student Visa",
+          featured_image: null,
+          tags: ["australia", "student visa", "study permit", "education"],
+          featured: false,
+          status: "published",
+          view_count: 650,
+          read_time: 7,
+          published_at: new Date().toISOString(),
+          created_at: new Date().toISOString()
+        },
+        {
+          id: 5,
+          title: "Canada Express Entry System",
+          slug: "canada-express-entry-system",
+          excerpt: "Understanding the Express Entry system for Canadian immigration.",
+          content: "The Express Entry system is Canada's main immigration pathway...",
+          author_name: "Visa Consultancy Team",
+          category: "Immigration",
+          featured_image: null,
+          tags: ["canada", "express entry", "immigration", "permanent residency"],
+          featured: true,
+          status: "published",
+          view_count: 1100,
+          read_time: 10,
+          published_at: new Date().toISOString(),
+          created_at: new Date().toISOString()
+        },
+        {
+          id: 6,
+          title: "US Tourist Visa Interview Tips",
+          slug: "us-tourist-visa-interview-tips",
+          excerpt: "Essential tips for acing your US tourist visa interview.",
+          content: "The US tourist visa interview can be nerve-wracking...",
+          author_name: "Visa Consultancy Team",
+          category: "Tourist Visa",
+          featured_image: null,
+          tags: ["usa", "tourist visa", "interview", "travel"],
+          featured: false,
+          status: "published",
+          view_count: 890,
+          read_time: 6,
+          published_at: new Date().toISOString(),
+          created_at: new Date().toISOString()
+        }
+      ];
 
-      const response = await fetch(`/api/blog?${queryParams}`);
-      const data = await response.json();
+      let filteredBlogs = mockBlogs.filter(blog => blog.status === 'published');
 
-      if (response.ok) {
-        setBlogs(data.blogs);
-        setPagination({
-          totalPages: data.totalPages,
-          currentPage: data.currentPage,
-          total: data.total
-        });
+      // Apply filters
+      if (         filters.category) {
+        filteredBlogs = filteredBlogs.filter(blog => blog.category === filters.category);
       }
+      
+      if (filters.search) {
+        const searchLower = filters.search.toLowerCase();
+        filteredBlogs = filteredBlogs.filter(blog => 
+          blog.title.toLowerCase().includes(searchLower) ||
+          blog.excerpt.toLowerCase().includes(searchLower) ||
+          blog.content.toLowerCase().includes(searchLower)
+        );
+      }
+      
+      if (filters.featured) {
+        filteredBlogs = filteredBlogs.filter(blog => blog.featured);
+      }
+
+      // Apply pagination
+      const total = filteredBlogs.length;
+      const startIndex = (filters.page - 1) * filters.limit;
+      const endIndex = startIndex + filters.limit;
+      const paginatedBlogs = filteredBlogs.slice(startIndex, endIndex);
+
+      setBlogs(paginatedBlogs);
+      setPagination({
+        totalPages: Math.ceil(total / filters.limit),
+        currentPage: filters.page,
+        total: total
+      });
     } catch (error) {
       console.error('Error fetching blogs:', error);
     } finally {
@@ -55,11 +175,15 @@ const BlogPage = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('/api/blog/categories');
-      const data = await response.json();
-      if (response.ok) {
-        setCategories(data);
-      }
+      // Mock categories for development
+      const mockCategories = [
+        { id: 1, name: 'Student Visa', description: 'Educational opportunities and study permits', color: 'blue' },
+        { id: 2, name: 'Work Visa', description: 'Employment and professional opportunities', color: 'green' },
+        { id: 3, name: 'Tourist Visa', description: 'Travel and tourism information', color: 'purple' },
+        { id: 4, name: 'Immigration', description: 'Permanent residency and citizenship', color: 'orange' },
+        { id: 5, name: 'Visa Information', description: 'General visa information and updates', color: 'indigo' }
+      ];
+      setCategories(mockCategories);
     } catch (error) {
       console.error('Error fetching categories:', error);
     }

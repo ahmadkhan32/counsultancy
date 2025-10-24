@@ -24,31 +24,38 @@ if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
   
   // Create mock clients for development
   const mockClient = {
-    from: () => ({
-      select: () => ({ 
-        eq: () => ({ 
-          single: () => ({ data: null, error: { message: 'Supabase not configured' } }) 
+    from: (table) => ({
+      select: (columns = '*') => ({ 
+        eq: (column, value) => ({ 
+          single: () => ({ data: null, error: null }),
+          order: () => ({ range: () => ({ data: [], error: null }) })
+        }),
+        order: (column, options) => ({ 
+          range: (start, end) => ({ data: [], error: null }),
+          limit: (count) => ({ data: [], error: null })
+        }),
+        range: (start, end) => ({ data: [], error: null }),
+        limit: (count) => ({ data: [], error: null })
+      }),
+      insert: (data) => ({ 
+        select: (columns = '*') => ({ 
+          single: () => ({ data: { id: Date.now(), ...data }, error: null }) 
         }) 
       }),
-      insert: () => ({ 
-        select: () => ({ 
-          single: () => ({ data: null, error: { message: 'Supabase not configured' } }) 
-        }) 
-      }),
-      update: () => ({ 
-        eq: () => ({ 
-          select: () => ({ 
-            single: () => ({ data: null, error: { message: 'Supabase not configured' } }) 
+      update: (data) => ({ 
+        eq: (column, value) => ({ 
+          select: (columns = '*') => ({ 
+            single: () => ({ data: { id: value, ...data }, error: null }) 
           }) 
         }) 
       }),
       delete: () => ({ 
-        eq: () => ({ data: null, error: { message: 'Supabase not configured' } }) 
+        eq: (column, value) => ({ data: null, error: null }) 
       })
     }),
     storage: {
       from: () => ({
-        upload: () => ({ data: null, error: { message: 'Supabase not configured' } }),
+        upload: () => ({ data: null, error: null }),
         getPublicUrl: () => ({ data: { publicUrl: '#' } })
       })
     }

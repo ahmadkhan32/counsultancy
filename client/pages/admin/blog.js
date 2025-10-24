@@ -192,11 +192,9 @@ const AdminBlogPage = () => {
               <FaRobot className="mr-2" />
               AI Assistant
             </button>
-            <Link href="/admin/blog/create">
-              <a className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300">
-                <FaPlus className="mr-2" />
-                New Post
-              </a>
+            <Link href="/admin/blog/create" className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300">
+              <FaPlus className="mr-2" />
+              New Post
             </Link>
           </div>
         </div>
@@ -365,16 +363,12 @@ const AdminBlogPage = () => {
                     </div>
                     
                     <div className="flex items-center space-x-2 ml-4">
-                      <Link href={`/blog/${blog.slug}`}>
-                        <a className="p-2 text-gray-600 hover:text-blue-600 transition duration-300">
-                          <FaEye />
-                        </a>
+                      <Link href={`/blog/${blog.slug}`} className="p-2 text-gray-600 hover:text-blue-600 transition duration-300">
+                        <FaEye />
                       </Link>
                       
-                      <Link href={`/admin/blog/edit/${blog.id}`}>
-                        <a className="p-2 text-gray-600 hover:text-green-600 transition duration-300">
-                          <FaEdit />
-                        </a>
+                      <Link href={`/admin/blog/edit/${blog.id}`} className="p-2 text-gray-600 hover:text-green-600 transition duration-300">
+                        <FaEdit />
                       </Link>
                       
                       <select
@@ -450,11 +444,9 @@ const AdminBlogPage = () => {
             <p className="text-gray-500 mb-6">
               Try adjusting your search criteria or create a new blog post.
             </p>
-            <Link href="/admin/blog/create">
-              <a className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300">
-                <FaPlus className="mr-2" />
-                Create First Blog Post
-              </a>
+            <Link href="/admin/blog/create" className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300">
+              <FaPlus className="mr-2" />
+              Create First Blog Post
             </Link>
           </div>
         )}

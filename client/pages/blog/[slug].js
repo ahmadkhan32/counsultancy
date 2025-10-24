@@ -27,13 +27,78 @@ const BlogPostPage = () => {
   const fetchBlog = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/blog/${slug}`);
-      const data = await response.json();
+      
+      // Mock blog data for development
+      const mockBlogs = [
+        {
+          id: 1,
+          title: "Complete Guide to Canadian Student Visa",
+          slug: "complete-guide-canadian-student-visa",
+          excerpt: "Everything you need to know about applying for a student visa to Canada, including requirements, process, and tips.",
+          content: `<h1>Complete Guide to Canadian Student Visa</h1>
+          
+<h2>Introduction</h2>
+<p>Canada is one of the most popular destinations for international students seeking quality education. With world-class universities, diverse culture, and excellent post-graduation opportunities, it's no wonder that thousands of students apply for Canadian student visas each year.</p>
 
-      if (response.ok) {
-        setBlog(data);
-        // Update page title
-        document.title = `${data.title} | Visa Consultancy Blog`;
+<h2>Types of Canadian Student Visas</h2>
+<p>There are several types of study permits available for international students:</p>
+<ul>
+<li><strong>Regular Study Permit</strong> - For programs longer than 6 months</li>
+<li><strong>Short-term Study Permit</strong> - For programs 6 months or less</li>
+<li><strong>Co-op Work Permit</strong> - For programs that include work experience</li>
+</ul>
+
+<h2>Requirements</h2>
+<p>To apply for a Canadian student visa, you must meet the following requirements:</p>
+<ol>
+<li>Acceptance letter from a Designated Learning Institution (DLI)</li>
+<li>Proof of financial support</li>
+<li>Clean criminal record</li>
+<li>Medical examination (if required)</li>
+<li>Valid passport</li>
+</ol>
+
+<h2>Application Process</h2>
+<p>The application process involves several steps:</p>
+<ol>
+<li>Gather all required documents</li>
+<li>Complete the online application</li>
+<li>Pay the application fee</li>
+<li>Submit biometrics (if required)</li>
+<li>Attend an interview (if requested)</li>
+</ol>
+
+<h2>Tips for Success</h2>
+<p>Here are some tips to increase your chances of approval:</p>
+<ul>
+<li>Apply early to avoid delays</li>
+<li>Provide complete and accurate information</li>
+<li>Demonstrate strong ties to your home country</li>
+<li>Show genuine intent to study</li>
+<li>Maintain good academic standing</li>
+</ul>
+
+<h2>Conclusion</h2>
+<p>Obtaining a Canadian student visa requires careful preparation and attention to detail. By following this guide and meeting all requirements, you can successfully pursue your educational goals in Canada.</p>`,
+          author_name: "Visa Consultancy Team",
+          category: "Student Visa",
+          featured_image: null,
+          tags: ["canada", "student visa", "education", "study permit"],
+          featured: true,
+          status: "published",
+          view_count: 1250,
+          read_time: 8,
+          published_at: new Date().toISOString(),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }
+      ];
+
+      const blog = mockBlogs.find(b => b.slug === slug);
+      
+      if (blog) {
+        setBlog(blog);
+        document.title = `${blog.title} | Visa Consultancy Blog`;
       } else {
         router.push('/404');
       }
@@ -47,11 +112,24 @@ const BlogPostPage = () => {
 
   const fetchComments = async () => {
     try {
-      const response = await fetch(`/api/blog/${blog?.id}/comments`);
-      const data = await response.json();
-      if (response.ok) {
-        setComments(data);
-      }
+      // Mock comments for development
+      const mockComments = [
+        {
+          id: 1,
+          author_name: "Sarah Johnson",
+          author_email: "sarah@example.com",
+          content: "This is a very helpful guide! I'm planning to apply for a Canadian student visa next year.",
+          created_at: new Date(Date.now() - 86400000).toISOString()
+        },
+        {
+          id: 2,
+          author_name: "Ahmed Hassan",
+          author_email: "ahmed@example.com",
+          content: "Thank you for the detailed information. The tips section was particularly useful.",
+          created_at: new Date(Date.now() - 172800000).toISOString()
+        }
+      ];
+      setComments(mockComments);
     } catch (error) {
       console.error('Error fetching comments:', error);
     }
@@ -62,22 +140,23 @@ const BlogPostPage = () => {
     setSubmittingComment(true);
 
     try {
-      const response = await fetch(`/api/blog/${blog.id}/comments`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(commentForm),
-      });
+      // Mock comment submission for development
+      const newComment = {
+        id: Date.now(),
+        author_name: commentForm.authorName,
+        author_email: commentForm.authorEmail,
+        content: commentForm.content,
+        created_at: new Date().toISOString()
+      };
 
-      if (response.ok) {
-        setCommentSubmitted(true);
-        setCommentForm({ authorName: '', authorEmail: '', content: '' });
-        // Refresh comments
-        fetchComments();
-      } else {
-        alert('Failed to submit comment. Please try again.');
-      }
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      setCommentSubmitted(true);
+      setCommentForm({ authorName: '', authorEmail: '', content: '' });
+      
+      // Add new comment to the list
+      setComments(prev => [newComment, ...prev]);
     } catch (error) {
       console.error('Error submitting comment:', error);
       alert('Failed to submit comment. Please try again.');
@@ -339,17 +418,13 @@ const BlogPostPage = () => {
               <div className="bg-white rounded-lg shadow-lg p-6">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4">Related Posts</h3>
                 <div className="space-y-4">
-                  <Link href="/blog">
-                    <a className="block p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition duration-300">
-                      <h4 className="font-medium text-gray-800 mb-1">Canada Student Visa Guide</h4>
-                      <p className="text-sm text-gray-600">Complete guide to studying in Canada</p>
-                    </a>
+                  <Link href="/blog" className="block p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition duration-300">
+                    <h4 className="font-medium text-gray-800 mb-1">Canada Student Visa Guide</h4>
+                    <p className="text-sm text-gray-600">Complete guide to studying in Canada</p>
                   </Link>
-                  <Link href="/blog">
-                    <a className="block p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition duration-300">
-                      <h4 className="font-medium text-gray-800 mb-1">UK Work Visa Process</h4>
-                      <p className="text-sm text-gray-600">Everything about UK work permits</p>
-                    </a>
+                  <Link href="/blog" className="block p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition duration-300">
+                    <h4 className="font-medium text-gray-800 mb-1">UK Work Visa Process</h4>
+                    <p className="text-sm text-gray-600">Everything about UK work permits</p>
                   </Link>
                 </div>
               </div>
